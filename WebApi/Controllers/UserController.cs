@@ -30,9 +30,15 @@ namespace WebApi.Controllers
         [HttpPost]
         public HttpResponseMessage CreateUser(Guid userId, [FromBody] UserModel model)
         {
-            if (userId == Guid.Empty)
+
+            // Check if the ID already exists in the repository
+            var existingId = _getUserService.GetUser(userId);
+
+            if (existingId != null)
             {
-               return Request.CreateErrorResponse(HttpStatusCode.BadRequest, "User Id was not provided.");
+                //throw new InvalidOperationException($"User with ID {userId} already exists.");
+                return Request.CreateErrorResponse(HttpStatusCode.BadRequest, "User Id already exists.");
+
             }
 
             var user = _createUserService.Create(userId, model.Name, model.Email, model.Type, model.AnnualSalary, model.Tags);
