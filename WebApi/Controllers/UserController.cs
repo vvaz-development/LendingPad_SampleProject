@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using BusinessEntities;
 using Core.Services.Users;
+using Raven.Abstractions.Data;
 using WebApi.Models.Users;
 
 namespace WebApi.Controllers
@@ -28,7 +30,13 @@ namespace WebApi.Controllers
         [HttpPost]
         public HttpResponseMessage CreateUser(Guid userId, [FromBody] UserModel model)
         {
+            if (userId == Guid.Empty)
+            {
+               return Request.CreateErrorResponse(HttpStatusCode.BadRequest, "User Id was not provided.");
+            }
+
             var user = _createUserService.Create(userId, model.Name, model.Email, model.Type, model.AnnualSalary, model.Tags);
+
             return Found(new UserData(user));
         }
 
@@ -89,7 +97,17 @@ namespace WebApi.Controllers
         [HttpGet]
         public HttpResponseMessage GetUsersByTag(string tag)
         {
-            throw new NotImplementedException();
+            if (string.IsNullOrEmpty(tag))
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.BadRequest, "Tag was not provided.");
+            }
+
+            // Using LINQ to filter users by tag
+            var users = _getUserService.GetUsers().Where(u => u.Tags.Contains(tag))
+                                                  .Select(u => new UserData(u))
+                                                  .ToList();
+
+            return Found(users);
         }
     }
 }
