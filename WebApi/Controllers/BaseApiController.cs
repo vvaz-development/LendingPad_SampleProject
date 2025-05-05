@@ -20,5 +20,15 @@ namespace WebApi.Controllers
         {
             return ControllerContext.Request.CreateResponse(HttpStatusCode.NotFound);
         }
+
+        public HttpResponseMessage AlreadyExist(object obj)
+        {
+            return Request.CreateErrorResponse(HttpStatusCode.BadRequest, "User Id already exists.");
+        }
+
+        public HttpResponseMessage AlreadyExist()
+        {
+            return Request.CreateErrorResponse(HttpStatusCode.BadRequest, "User Id already exists.");
+        }
     }
 }

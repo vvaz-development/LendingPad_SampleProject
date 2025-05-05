@@ -36,9 +36,7 @@ namespace WebApi.Controllers
 
             if (existingId != null)
             {
-                //throw new InvalidOperationException($"User with ID {userId} already exists.");
-                return Request.CreateErrorResponse(HttpStatusCode.BadRequest, "User Id already exists.");
-
+                return AlreadyExist();
             }
 
             var user = _createUserService.Create(userId, model.Name, model.Email, model.Type, model.AnnualSalary, model.Tags);
